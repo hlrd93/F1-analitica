@@ -1,0 +1,136 @@
+site_name: F1 Analytics - Data Engineering Portfolio
+site_description: Formula 1 Data Analytics Platform - UCU Masters Project
+site_author: Herwin
+site_url: https://herwin.github.io/f1-analytics
+
+repo_name: herwin/f1-analytics
+repo_url: https://github.com/herwin/f1-analytics
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: red
+      accent: deep orange
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: red
+      accent: deep orange
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  
+  font:
+    text: Roboto
+    code: Roboto Mono
+  
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - content.code.copy
+    - content.code.annotate
+  
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search
+  - tags
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - admonition
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - attr_list
+  - md_in_html
+  - tables
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Quick Start: getting-started.md
+    - Installation: setup/installation.md
+    - First Steps: setup/first-steps.md
+  
+  - Strategy & Vision:
+    - EverPass Alignment: strategy/why-everpass.md
+    - Technology Strategy: strategy/tech-strategy.md
+    - Optimization Approach: strategy/optimization.md
+  
+  - Architecture:
+    - Overview: architecture/overview.md
+    - Tech Stack: architecture/tech-stack.md
+    - Data Model: architecture/data-model.md
+    - Pipeline Design: architecture/pipeline.md
+  
+  - Technologies:
+    - Polars: technologies/polars.md
+    - dbt: technologies/dbt.md
+    - Apache Airflow: technologies/airflow.md
+    - Streamlit: technologies/streamlit.md
+    - PostgreSQL: technologies/postgresql.md
+    - MLflow: technologies/mlflow.md
+    - Docker: technologies/docker.md
+  
+  - Sprint Planning:
+    - Sprint 1-2: sprints/sprint-01-02.md
+    - Sprint 3-4: sprints/sprint-03-04.md
+    - Sprint 5-6: sprints/sprint-05-06.md
+    - Sprint 7-8: sprints/sprint-07-08.md
+    - Sprint 9-10: sprints/sprint-09-10.md
+    - Sprint 11-12: sprints/sprint-11-12.md
+  
+  - User Stories:
+    - Foundation: user-stories/foundation.md
+    - Transformation: user-stories/transformation.md
+    - Orchestration: user-stories/orchestration.md
+    - Processing: user-stories/processing.md
+    - Machine Learning: user-stories/ml.md
+    - Delivery: user-stories/delivery.md
+  
+  - Resources:
+    - Learning Path: resources/learning.md
+    - Troubleshooting: resources/troubleshooting.md
+    - References: resources/references.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/herwin
+    - icon: fontawesome/brands/linkedin
+      link: https://linkedin.com/in/herwin
+  
+  analytics:
+    provider: google
+    property: G-XXXXXXXXXX  # Replace with your GA ID
+
+copyright: Copyright &copy; 2024 Herwin - UCU Masters in Data Science
