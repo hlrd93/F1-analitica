@@ -1,0 +1,18 @@
+columns substreams version: 1
+5 columns:
+2 substreams for column `constructorResultsId`:
+	constructorResultsId.size
+	constructorResultsId
+2 substreams for column `raceId`:
+	raceId.size
+	raceId
+2 substreams for column `constructorId`:
+	constructorId.size
+	constructorId
+2 substreams for column `points`:
+	points.size
+	points
+3 substreams for column `status`:
+	status.sparse.idx
+	status.size
+	status

@@ -1,0 +1,56 @@
+columns substreams version: 1
+18 columns:
+2 substreams for column `resultId`:
+	resultId.size
+	resultId
+2 substreams for column `raceId`:
+	raceId.size
+	raceId
+2 substreams for column `driverId`:
+	driverId.size
+	driverId
+2 substreams for column `constructorId`:
+	constructorId.size
+	constructorId
+2 substreams for column `number`:
+	number.size
+	number
+2 substreams for column `grid`:
+	grid.size
+	grid
+2 substreams for column `position`:
+	position.size
+	position
+2 substreams for column `positionText`:
+	positionText.size
+	positionText
+2 substreams for column `positionOrder`:
+	positionOrder.size
+	positionOrder
+2 substreams for column `points`:
+	points.size
+	points
+2 substreams for column `laps`:
+	laps.size
+	laps
+2 substreams for column `time`:
+	time.size
+	time
+2 substreams for column `milliseconds`:
+	milliseconds.size
+	milliseconds
+2 substreams for column `fastestLap`:
+	fastestLap.size
+	fastestLap
+2 substreams for column `rank`:
+	rank.size
+	rank
+2 substreams for column `fastestLapTime`:
+	fastestLapTime.size
+	fastestLapTime
+2 substreams for column `fastestLapSpeed`:
+	fastestLapSpeed.size
+	fastestLapSpeed
+2 substreams for column `statusId`:
+	statusId.size
+	statusId

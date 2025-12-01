@@ -1,0 +1,11 @@
+columns format version: 1
+9 columns:
+`circuitId` String
+`circuitRef` String
+`name` String
+`location` String
+`country` String
+`lat` String
+`lng` String
+`alt` String
+`url` String

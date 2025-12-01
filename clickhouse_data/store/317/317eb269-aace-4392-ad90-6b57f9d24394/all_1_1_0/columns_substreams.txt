@@ -1,0 +1,20 @@
+columns substreams version: 1
+8 columns:
+1 substreams for column `sk_fecha`:
+	sk_fecha
+1 substreams for column `fecha`:
+	fecha
+1 substreams for column `dia`:
+	dia
+1 substreams for column `mes`:
+	mes
+1 substreams for column `anio`:
+	anio
+1 substreams for column `es_fin_de_semana`:
+	es_fin_de_semana
+2 substreams for column `nombre_mes`:
+	nombre_mes.size
+	nombre_mes
+2 substreams for column `nombre_dia`:
+	nombre_dia.size
+	nombre_dia

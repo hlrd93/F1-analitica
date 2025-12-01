@@ -1,0 +1,11 @@
+columns format version: 1
+9 columns:
+`driverId` String
+`driverRef` String
+`number` String
+`code` String
+`forename` String
+`surname` String
+`dob` String
+`nationality` String
+`url` String

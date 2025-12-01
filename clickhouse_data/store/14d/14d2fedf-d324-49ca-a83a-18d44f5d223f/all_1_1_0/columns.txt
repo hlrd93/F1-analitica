@@ -1,0 +1,11 @@
+columns format version: 1
+9 columns:
+`qualifyId` String
+`raceId` String
+`driverId` String
+`constructorId` String
+`number` String
+`position` String
+`q1` String
+`q2` String
+`q3` String

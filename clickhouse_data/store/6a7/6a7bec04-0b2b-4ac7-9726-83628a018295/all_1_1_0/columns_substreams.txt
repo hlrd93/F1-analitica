@@ -1,0 +1,23 @@
+columns substreams version: 1
+7 columns:
+2 substreams for column `raceId`:
+	raceId.size
+	raceId
+2 substreams for column `driverId`:
+	driverId.size
+	driverId
+2 substreams for column `stop`:
+	stop.size
+	stop
+2 substreams for column `lap`:
+	lap.size
+	lap
+2 substreams for column `time`:
+	time.size
+	time
+2 substreams for column `duration`:
+	duration.size
+	duration
+2 substreams for column `milliseconds`:
+	milliseconds.size
+	milliseconds

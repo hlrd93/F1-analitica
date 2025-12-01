@@ -1,0 +1,4 @@
+dbt-core==1.10.15
+# Use the adapter used previously in this environment
+dbt-clickhouse==1.9.6
+clickhouse-connect>=0.10.0

@@ -1,0 +1,7 @@
+columns format version: 1
+5 columns:
+`constructorId` String
+`constructorRef` String
+`name` String
+`nationality` String
+`url` String

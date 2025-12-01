@@ -1,0 +1,8 @@
+columns substreams version: 1
+2 columns:
+2 substreams for column `year`:
+	year.size
+	year
+2 substreams for column `url`:
+	url.size
+	url

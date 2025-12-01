@@ -1,0 +1,18 @@
+columns substreams version: 1
+7 columns:
+1 substreams for column `raceId`:
+	raceId
+1 substreams for column `year`:
+	year
+1 substreams for column `round`:
+	round
+1 substreams for column `circuitId`:
+	circuitId
+2 substreams for column `name`:
+	name.size
+	name
+1 substreams for column `fecha`:
+	fecha
+2 substreams for column `time`:
+	time.size
+	time

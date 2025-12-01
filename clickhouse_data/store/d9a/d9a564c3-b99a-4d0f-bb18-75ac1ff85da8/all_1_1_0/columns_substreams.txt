@@ -1,0 +1,29 @@
+columns substreams version: 1
+9 columns:
+2 substreams for column `driverId`:
+	driverId.size
+	driverId
+2 substreams for column `driverRef`:
+	driverRef.size
+	driverRef
+2 substreams for column `number`:
+	number.size
+	number
+2 substreams for column `code`:
+	code.size
+	code
+2 substreams for column `forename`:
+	forename.size
+	forename
+2 substreams for column `surname`:
+	surname.size
+	surname
+2 substreams for column `dob`:
+	dob.size
+	dob
+2 substreams for column `nationality`:
+	nationality.size
+	nationality
+2 substreams for column `url`:
+	url.size
+	url

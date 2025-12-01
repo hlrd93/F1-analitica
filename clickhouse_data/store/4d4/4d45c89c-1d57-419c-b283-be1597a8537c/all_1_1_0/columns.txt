@@ -1,0 +1,20 @@
+columns format version: 1
+18 columns:
+`resultId` String
+`raceId` String
+`driverId` String
+`constructorId` String
+`number` String
+`grid` String
+`position` String
+`positionText` String
+`positionOrder` String
+`points` String
+`laps` String
+`time` String
+`milliseconds` String
+`fastestLap` String
+`rank` String
+`fastestLapTime` String
+`fastestLapSpeed` String
+`statusId` String

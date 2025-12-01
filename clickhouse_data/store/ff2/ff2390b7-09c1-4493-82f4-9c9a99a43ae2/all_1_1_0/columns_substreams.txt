@@ -1,0 +1,23 @@
+columns substreams version: 1
+7 columns:
+2 substreams for column `constructorStandingsId`:
+	constructorStandingsId.size
+	constructorStandingsId
+2 substreams for column `raceId`:
+	raceId.size
+	raceId
+2 substreams for column `constructorId`:
+	constructorId.size
+	constructorId
+2 substreams for column `points`:
+	points.size
+	points
+2 substreams for column `position`:
+	position.size
+	position
+2 substreams for column `positionText`:
+	positionText.size
+	positionText
+2 substreams for column `wins`:
+	wins.size
+	wins

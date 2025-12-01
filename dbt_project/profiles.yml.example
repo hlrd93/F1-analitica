@@ -1,0 +1,13 @@
+# Example profiles.yml for dbt + ClickHouse. Place a real profiles.yml at ~/.dbt/profiles.yml
+clickhouse:
+  target: dev
+  outputs:
+    dev:
+      type: clickhouse
+      threads: 1
+      host: localhost
+      port: 8123
+      user: default
+      pass: ""  # or your password
+      database: raw
+      schema: raw

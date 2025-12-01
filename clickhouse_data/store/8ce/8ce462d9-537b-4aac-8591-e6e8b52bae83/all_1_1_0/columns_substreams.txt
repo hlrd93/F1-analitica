@@ -1,0 +1,63 @@
+columns substreams version: 1
+18 columns:
+2 substreams for column `raceId`:
+	raceId.size
+	raceId
+2 substreams for column `year`:
+	year.size
+	year
+2 substreams for column `round`:
+	round.size
+	round
+2 substreams for column `circuitId`:
+	circuitId.size
+	circuitId
+2 substreams for column `name`:
+	name.size
+	name
+2 substreams for column `date`:
+	date.size
+	date
+2 substreams for column `time`:
+	time.size
+	time
+2 substreams for column `url`:
+	url.size
+	url
+2 substreams for column `fp1_date`:
+	fp1_date.size
+	fp1_date
+3 substreams for column `fp1_time`:
+	fp1_time.sparse.idx
+	fp1_time.size
+	fp1_time
+2 substreams for column `fp2_date`:
+	fp2_date.size
+	fp2_date
+3 substreams for column `fp2_time`:
+	fp2_time.sparse.idx
+	fp2_time.size
+	fp2_time
+3 substreams for column `fp3_date`:
+	fp3_date.sparse.idx
+	fp3_date.size
+	fp3_date
+3 substreams for column `fp3_time`:
+	fp3_time.sparse.idx
+	fp3_time.size
+	fp3_time
+2 substreams for column `quali_date`:
+	quali_date.size
+	quali_date
+3 substreams for column `quali_time`:
+	quali_time.sparse.idx
+	quali_time.size
+	quali_time
+3 substreams for column `sprint_date`:
+	sprint_date.sparse.idx
+	sprint_date.size
+	sprint_date
+3 substreams for column `sprint_time`:
+	sprint_time.sparse.idx
+	sprint_time.size
+	sprint_time

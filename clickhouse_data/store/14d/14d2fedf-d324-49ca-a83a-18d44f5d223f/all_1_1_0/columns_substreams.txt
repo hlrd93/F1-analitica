@@ -1,0 +1,29 @@
+columns substreams version: 1
+9 columns:
+2 substreams for column `qualifyId`:
+	qualifyId.size
+	qualifyId
+2 substreams for column `raceId`:
+	raceId.size
+	raceId
+2 substreams for column `driverId`:
+	driverId.size
+	driverId
+2 substreams for column `constructorId`:
+	constructorId.size
+	constructorId
+2 substreams for column `number`:
+	number.size
+	number
+2 substreams for column `position`:
+	position.size
+	position
+2 substreams for column `q1`:
+	q1.size
+	q1
+2 substreams for column `q2`:
+	q2.size
+	q2
+2 substreams for column `q3`:
+	q3.size
+	q3

@@ -1,0 +1,9 @@
+columns format version: 1
+7 columns:
+`resultId` String
+`raceId` UInt32
+`driverId` String
+`constructorId` String
+`positionOrder` Int8
+`points` Nullable(Float32)
+`sk_fecha` UInt32

@@ -1,0 +1,25 @@
+version: 2
+
+models:
+  - name: stg_races
+    description: "Staging for raw races data"
+    columns:
+      - name: fecha
+        tests:
+          - not_null
+  - name: dim_fecha
+    description: "Date dimension generated from race dates"
+    columns:
+      - name: sk_fecha
+        tests:
+          - unique
+          - not_null
+  - name: fact_race_results
+    description: "Fact table for race-level results"
+    columns:
+      - name: resultId
+        tests:
+          - not_null
+      - name: sk_fecha
+        tests:
+          - not_null

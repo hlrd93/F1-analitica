@@ -1,0 +1,9 @@
+columns format version: 1
+7 columns:
+`raceId` UInt32
+`year` UInt16
+`round` UInt16
+`circuitId` UInt32
+`name` String
+`fecha` Date
+`time` String

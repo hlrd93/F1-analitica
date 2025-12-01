@@ -1,0 +1,9 @@
+columns format version: 1
+7 columns:
+`raceId` String
+`driverId` String
+`stop` String
+`lap` String
+`time` String
+`duration` String
+`milliseconds` String

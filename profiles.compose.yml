@@ -1,0 +1,14 @@
+clickhouse:
+  target: dev
+  outputs:
+    dev:
+      type: clickhouse
+      driver: http
+      threads: 1
+      host: clickhouse
+      port: 8123
+      user: loader
+      password: 'loaderpass'
+      database: analytics
+      schema: analytics
+  check_exchange: False

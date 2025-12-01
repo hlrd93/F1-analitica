@@ -1,0 +1,9 @@
+columns format version: 1
+7 columns:
+`driverStandingsId` String
+`raceId` String
+`driverId` String
+`points` String
+`position` String
+`positionText` String
+`wins` String

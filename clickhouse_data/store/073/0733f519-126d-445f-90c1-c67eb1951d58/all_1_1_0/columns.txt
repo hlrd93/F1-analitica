@@ -1,0 +1,8 @@
+columns format version: 1
+6 columns:
+`raceId` String
+`driverId` String
+`lap` String
+`position` String
+`time` String
+`milliseconds` String

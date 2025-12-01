@@ -1,0 +1,29 @@
+columns substreams version: 1
+9 columns:
+2 substreams for column `circuitId`:
+	circuitId.size
+	circuitId
+2 substreams for column `circuitRef`:
+	circuitRef.size
+	circuitRef
+2 substreams for column `name`:
+	name.size
+	name
+2 substreams for column `location`:
+	location.size
+	location
+2 substreams for column `country`:
+	country.size
+	country
+2 substreams for column `lat`:
+	lat.size
+	lat
+2 substreams for column `lng`:
+	lng.size
+	lng
+2 substreams for column `alt`:
+	alt.size
+	alt
+2 substreams for column `url`:
+	url.size
+	url

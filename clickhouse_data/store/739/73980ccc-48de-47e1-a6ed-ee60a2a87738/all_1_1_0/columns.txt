@@ -1,0 +1,7 @@
+columns format version: 1
+5 columns:
+`constructorResultsId` String
+`raceId` String
+`constructorId` String
+`points` String
+`status` String

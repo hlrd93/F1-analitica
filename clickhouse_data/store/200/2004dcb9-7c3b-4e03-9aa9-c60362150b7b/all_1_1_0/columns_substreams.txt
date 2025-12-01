@@ -1,0 +1,17 @@
+columns substreams version: 1
+5 columns:
+2 substreams for column `constructorId`:
+	constructorId.size
+	constructorId
+2 substreams for column `constructorRef`:
+	constructorRef.size
+	constructorRef
+2 substreams for column `name`:
+	name.size
+	name
+2 substreams for column `nationality`:
+	nationality.size
+	nationality
+2 substreams for column `url`:
+	url.size
+	url

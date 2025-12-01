@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<workbook source-build="20201.22" version="19.2">
+  <document-presModel>default</document-presModel>
+  <datasources>
+    <datasource name="constructor_metrics_top200" caption="constructor_metrics_top200">
+      <connection class="text">
+        <connection-details>
+          <detail name="filename">docs/tableau_extracts/constructor_metrics_top200.csv</detail>
+          <detail name="format">csv</detail>
+          <detail name="delimiter">,</detail>
+          <detail name="encoding">utf-8</detail>
+        </connection-details>
+      </connection>
+    </datasource>
+    <datasource name="constructor_time_series_sample" caption="constructor_time_series_sample">
+      <connection class="text">
+        <connection-details>
+          <detail name="filename">docs/tableau_extracts/constructor_time_series_sample.csv</detail>
+          <detail name="format">csv</detail>
+          <detail name="delimiter">,</detail>
+          <detail name="encoding">utf-8</detail>
+        </connection-details>
+      </connection>
+    </datasource>
+  </datasources>
+
+  <worksheets>
+    <worksheet name="Cost vs Podium">
+      <table>
+        <columns>
+          <column source="constructor_metrics_top200" field="constructor_name"/>
+          <column source="constructor_metrics_top200" field="cost_proxy_score"/>
+          <column source="constructor_metrics_top200" field="podium_rate"/>
+          <column source="constructor_metrics_top200" field="recent_podium_rate"/>
+        </columns>
+        <marks type="circle"/>
+      </table>
+    </worksheet>
+
+    <worksheet name="Recent Podium Time Series">
+      <table>
+        <columns>
+          <column source="constructor_time_series_sample" field="race_date"/>
+          <column source="constructor_time_series_sample" field="constructor_name"/>
+          <column source="constructor_time_series_sample" field="recent_podium_rate"/>
+        </columns>
+        <marks type="line"/>
+      </table>
+    </worksheet>
+  </worksheets>
+
+  <dashboard name="ROI Explorer">
+    <zone name="left">
+      <worksheet-ref name="Cost vs Podium"/>
+    </zone>
+    <zone name="right">
+      <worksheet-ref name="Recent Podium Time Series"/>
+    </zone>
+  </dashboard>
+</workbook>

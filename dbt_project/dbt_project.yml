@@ -1,0 +1,13 @@
+name: 'f1_analitica'
+version: '1.0'
+config-version: 2
+
+profile: 'clickhouse'
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+
+models:
+  f1_analitica:
+    +materialized: table
