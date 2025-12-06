@@ -123,5 +123,3 @@ A continuación se muestra la tabla con los Top-10 pilotos activos (han corrido 
 | 10 | 850 | Pietro Fittipaldi | 1 |
 
 Estos resultados verifican que la consulta que restringe a pilotos activos en los últimos 5 años produce un ranking coherente con los datos en `analytics`.
-
-Si prefieres, puedo añadir una versión en tabla HTML/CSV o incrustar un gráfico SVG con el mismo ranking.
