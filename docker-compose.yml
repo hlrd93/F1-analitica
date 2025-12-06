@@ -11,12 +11,10 @@ services:
         hard: 262144
     volumes:
       - clickhouse_data:/var/lib/clickhouse
-      # If you want to provide a custom config, mount it here. Leave commented out to use embedded defaults.
-      # - ./clickhouse_config:/etc/clickhouse-server
     ports:
-      - "9000:9000"   # native TCP
-      - "8123:8123"   # HTTP interface
-      - "9009:9009"   # interserver (optional)
+      - "9000:9000"
+      - "8123:8123"
+      - "9009:9009"
     env_file:
       - ./scripts/.env
 
@@ -29,7 +27,6 @@ services:
       - ./:/workspace
       - ~/.dbt:/root/.dbt
     working_dir: /workspace
-    # Run as the same UID/GID as ClickHouse so files created by dbt have correct ownership
     user: "101:101"
     entrypoint: ["/bin/bash","-lc"]
     command: ["/bin/bash","-lc","dbt debug --profiles-dir /root/.dbt && dbt run --profiles-dir /root/.dbt && dbt test --profiles-dir /root/.dbt"]

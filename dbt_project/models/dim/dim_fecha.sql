@@ -1,4 +1,4 @@
--- Dim table for dates. Materializes a date dimension from the races dataset.
+-- Dim table for dates
 SELECT
   toUInt32(replaceAll(toString(fecha), '-', '')) AS sk_fecha,
   fecha AS fecha,

@@ -1,5 +1,5 @@
 {{ config(materialized='table') }}
--- Fact table for race results (persisted for BI/Tableau)
+-- Fact table for race results
 SELECT
   r.resultId,
   toUInt32(r.raceId) AS raceId,

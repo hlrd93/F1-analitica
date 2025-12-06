@@ -1,5 +1,5 @@
 {{ config(materialized='table') }}
--- Staging table for races (casting only)
+-- Staging table for races
 SELECT
   toUInt32(raceId) AS raceId,
   toUInt16(year) AS year,
