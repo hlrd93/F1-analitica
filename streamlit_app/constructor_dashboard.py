@@ -7,7 +7,8 @@ import streamlit as st
 
 
 ROOT = Path(__file__).resolve().parents[1]
-EXTRACT_DIR = ROOT / "docs" / "tableau_extracts"
+# Streamlit extracts directory (renamed from tableau_extracts)
+EXTRACT_DIR = ROOT / "docs" / "streamlit_extracts"
 METRICS_CSV = EXTRACT_DIR / "constructor_metrics_full.csv"
 TS_CSV = EXTRACT_DIR / "constructor_time_series_full.csv"
 

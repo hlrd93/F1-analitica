@@ -1,0 +1,6 @@
+flowchart LR
+  A[CSV files: datasets/] -->|ingest scripts| B[ClickHouse: raw database]
+  B -->|dbt models| C[ClickHouse: analytics database]
+  C -->|reads| D[streamlit_app]
+  E[docker-compose.yml] -.-> B
+  E -.-> C
