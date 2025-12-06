@@ -1,0 +1,12 @@
+version: 2
+
+snapshots:
+  - name: driver_constructors_snapshot
+    description: "SCD Type 2 snapshot for driver -> constructor assignments. Tracks constructor changes per driver over time."
+    columns:
+      - name: driverId
+        description: "Driver identifier (unique_key)"
+      - name: constructorId
+        description: "Constructor identifier assigned for a race"
+      - name: sk_fecha
+        description: "Race date surrogate (YYYYMMDD) taken from fact_race_results to allow time filtering in analyses"

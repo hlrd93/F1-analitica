@@ -4,6 +4,7 @@ site_author: hlrd93
 nav:
   - Home: index.md
   - Arquitectura: architecture.md
+  - Snapshots: snapshots.md
   - Ingestión: ingestion.md
   - Implementación: implementation.md
   - Metodología: metodologia.md
@@ -19,3 +20,4 @@ markdown_extensions:
   - attr_list
 plugins:
   - search
+  - mermaid2

@@ -1,12 +1,11 @@
-## Ingestión — pasos reproducibles (basado en `scripts/`)
+## Ingestión — pasos reproducibles
 
-El repositorio ya incluye dos maneras reproducibles de cargar los CSVs en
-ClickHouse:
+El repositorio incluye dos maneras reproducibles de cargar los CSVs en ClickHouse:
 
-- Enfoque por Docker (recomendado para evaluación): `scripts/ingest_csvs_with_docker.sh`.
-- Enfoque por Python: `scripts/load_csvs_to_clickhouse.py` (usa `clickhouse-connect`).
+- Enfoque por Docker: `scripts/ingest_csvs_with_docker.sh` — útil para ejecutar el proceso tal como se hizo en el entorno original y para evaluaciones que requieren reproducibilidad del contenedor.
+- Enfoque por Python: `scripts/load_csvs_to_clickhouse.py` — implementa la carga usando la librería `clickhouse-connect` para conexión y bulk inserts desde Python.
 
-Resumen de los pasos (tal como están en `scripts/README.md`):
+Resumen del flujo y decisiones operativas:
 
 1. Levantar ClickHouse con `docker-compose.yml`:
 
@@ -14,25 +13,21 @@ Resumen de los pasos (tal como están en `scripts/README.md`):
 docker compose --env-file ./scripts/.env up -d
 ```
 
-2. Ejecutar el script de ingestión (el mismo loop usado en la carga original):
+2. Ejecutar el script de ingestión por contenedor (opción Docker):
 
 ```bash
 chmod +x scripts/ingest_csvs_with_docker.sh
 ./scripts/ingest_csvs_with_docker.sh
 ```
 
-3. Verificar conteos (ejemplo):
+3. Alternativa: ejecutar el loader Python (opción programática):
 
 ```bash
-docker exec -i clickhouse clickhouse-client --query "SELECT table, sum(rows) AS rows FROM system.parts WHERE database='raw' GROUP BY table ORDER BY table;"
+python3 scripts/load_csvs_to_clickhouse.py
 ```
 
-Decisiones observadas en el código y su justificación:
+Razonamiento detrás del diseño de ingestión (más detalle):
 
-- Las tablas `raw.raw_<name>` se crean con todas las columnas como `String` para evitar problemas de parsing en la primera ingestión. Esto aparece en `scripts/load_csvs_to_clickhouse.py`.
-- El loader Python reemplaza literal `\\N` por cadena vacía antes de insertar para evitar que ClickHouse lo interprete literalmente.
+- Carga en dos etapas: la decisión de escribir inicialmente todas las columnas como `String` en tablas dentro del esquema `raw` responde a dos necesidades: (1) resiliencia durante la ingestión — evitar abortos por errores de parseo o por valores inesperados — y (2) permitir una ingestión rápida desde múltiples archivos heterogéneos. Una vez los datos están disponibles en ClickHouse, `dbt` transforma y valida los datos en la capa `Transform` aplicando castings, normalizaciones y tests de calidad.
 
-Recomendaciones para la entrega:
-
-- Mantener la copia exacta de `scripts/ingest_csvs_with_docker.sh` y el `docker-compose.yml` en la carpeta de entrega.
-- Documentar en el informe por qué se hace la ingestión en `String` y cómo `dbt` hace el casting posterior. Esto ya está indicado en `scripts/README.md`.
+- Implementación técnica: el loader en `scripts/load_csvs_to_clickhouse.py` usa `clickhouse-connect` para crear tablas cuando es necesario y cargar datos en bloque. El script incluye medidas prácticas como el manejo de marcadores de nulos (`\N`), control de reintentos por archivo y logging básico para facilitar auditoría y reejecuciones.
