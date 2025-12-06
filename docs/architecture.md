@@ -5,54 +5,67 @@ Este diagrama refleja la arquitectura real implementada en el repo.
 <div class="mermaid">
 flowchart LR
   subgraph Source
-    CSVs[CSV files (datasets/)]
+    A[CSV files]
   end
 
   subgraph Ingest
-    %% Staging / Ingest
-    Load[load_csvs_to_clickhouse.py]
-    Shell[ingest_csvs_with_docker.sh]
+    B[load_csvs]
+    C[ingest_shell]
   end
 
   subgraph RawDB
-    %% ClickHouse - raw
-    Raw[raw tables]
+    D[raw_tables]
   end
 
   subgraph Transform
-    %% Transforms / Models
-    DBT[dbt_project (models/tests)]
+    E[dbt_models]
   end
 
   subgraph AnalyticsDB
-    %% ClickHouse - analytics
-    Analytics[analytics tables]
+    F[analytics_tables]
   end
 
   subgraph Viz
-    %% Visualización
-    Streamlit[streamlit_app]
+    G[streamlit]
   end
 
-  CSVs --> Load
-  CSVs --> Shell
-  Load --> Raw
-  Shell --> Raw
-  Raw --> DBT
-  DBT --> Analytics
-  Analytics --> Streamlit
-  Docker[docker-compose.yml] -.-> Raw
-  Docker -.-> Analytics
-
-  %% notes
-  %% removed classDef to avoid syntax issues
+  A --> B
+  A --> C
+  B --> D
+  C --> D
+  D --> E
+  E --> F
+  F --> G
+  H[docker_compose] -.-> D
+  H -.-> F
 </div>
 
 <!-- Static fallbacks in case client-side Mermaid fails to render -->
 <picture>
-  <source type="image/svg+xml" srcset="diagrams/architecture.svg">
-  <img src="diagrams/architecture.png" alt="Arquitectura del pipeline (fallback)" style="max-width:100%;height:auto;">
+  <source type="image/svg+xml" srcset="/diagrams/architecture.svg">
+  <img src="/diagrams/architecture.png" alt="Arquitectura del pipeline (fallback)" style="max-width:100%;height:auto;">
 </picture>
+
+<script>
+// Hide/show fallback image depending on whether mermaid rendered successfully.
+// If mermaid produced an error SVG (aria-roledescription="error"), hide the mermaid block
+// and leave the fallback picture visible. If mermaid succeeds hide the fallback.
+document.addEventListener('DOMContentLoaded', function(){
+  // Wait briefly for mermaid to render
+  setTimeout(function(){
+    document.querySelectorAll('.mermaid').forEach(function(m){
+      var pic = m.nextElementSibling;
+      var isError = !!m.querySelector('svg[aria-roledescription="error"]');
+      if (isError){
+        m.style.display = 'none';
+        if (pic && pic.tagName && pic.tagName.toLowerCase() === 'picture') pic.style.display = '';
+      } else {
+        if (pic && pic.tagName && pic.tagName.toLowerCase() === 'picture') pic.style.display = 'none';
+      }
+    });
+  }, 600);
+});
+</script>
 
 Descripción de componentes (referencias reales):
 
