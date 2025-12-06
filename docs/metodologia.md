@@ -138,29 +138,6 @@ Leyenda: |████████| = Ejecución | |R| = Sprint Review | |E| = E
 
 ---
 
-## Tabla de Dependencias
-
-```
-US-101 Docker          ─────┐
-US-102 Ingesta         ──────┤──→ US-103 Staging ─────┐
-US-104 Arquitectura    ──────┘                         │
-                                                        ├──→ US-105 Validación
-                                                        │
-US-201 dbt Staging ────┐                               │
-US-202 Dimensiones ────┼──→ US-203 Fact Table ──────┐  │
-US-204 Snapshots ──────┘                            │  │
-                                                     ├──→ US-301 Dashboard Streamlit
-                                                     │   ├──→ US-302 Visualización
-                                                     │   ├──→ US-303 Mapeo Nombres
-                                                     │   ├──→ US-304 Documentación
-                                                     │   └──→ US-305 Gantt
-
-US-105 Validación ────────────────────────────────────┐
-                                                       └──→ Proyecto COMPLETADO ✅
-```
-
----
-
 ## Ceremonias Scrum
 
 ### Planificación de Sprint
