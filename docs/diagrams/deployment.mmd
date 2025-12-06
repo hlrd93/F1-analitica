@@ -1,0 +1,10 @@
+graph LR
+  subgraph Local
+    DC[docker-compose]
+    ClickHouse[clickhouse container]
+    DBT[dbt-runner container]
+  end
+  CSVs[datasets/] --> DC
+  DC --> ClickHouse
+  DC --> DBT
+  DBT --> ClickHouse

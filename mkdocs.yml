@@ -1,0 +1,21 @@
+site_name: F1 Analytics Docs
+site_description: Documentación del proyecto de data pipeline (F1-analitica)
+site_author: hlrd93
+nav:
+  - Home: index.md
+  - Arquitectura: architecture.md
+  - Ingestión: ingestion.md
+  - Implementación: implementation.md
+  - Metodología: metodologia.md
+  - ADRs:
+      - 0001-use-clickhouse: adr/0001-use-clickhouse.md
+theme:
+  name: material
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: true
+  - pymdownx.superfences
+  - attr_list
+plugins:
+  - search
