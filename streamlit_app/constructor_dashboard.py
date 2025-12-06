@@ -1,9 +1,17 @@
 import io
+import os
 from pathlib import Path
+from datetime import date
 
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+
+# Optional ClickHouse client (used if environment and connectivity exist)
+try:
+    from clickhouse_connect import get_client
+except Exception:
+    get_client = None
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -11,6 +19,8 @@ ROOT = Path(__file__).resolve().parents[1]
 EXTRACT_DIR = ROOT / "docs" / "streamlit_extracts"
 METRICS_CSV = EXTRACT_DIR / "constructor_metrics_full.csv"
 TS_CSV = EXTRACT_DIR / "constructor_time_series_full.csv"
+DATASETS_DIR = ROOT / ".." / "datasets"
+RESULTS_CSV = DATASETS_DIR / "results.csv"
 
 
 @st.cache_data
@@ -121,6 +131,327 @@ def main():
             title="Recent podium rate over time (rolling last-12 races)",
         )
         st.plotly_chart(fig_ts, use_container_width=True)
+
+    st.markdown("---")
+    st.header("Drivers with fewest constructor changes — last 5 years")
+
+    @st.cache_data
+    def compute_top10_least_changes_from_csv(path: Path):
+        # Fallback logic using datasets/results.csv
+        df = pd.read_csv(path, parse_dates=["date"], infer_datetime_format=True)
+        # results.csv has race-level date in `date` column, and columns driverId, constructorId
+        # Filter last 5 years
+        cutoff = pd.to_datetime(date.today()) - pd.DateOffset(years=5)
+        if "date" in df.columns:
+            df = df[pd.to_datetime(df["date"]) >= cutoff]
+
+        # Ensure we have the necessary columns
+        if not set(["driverId", "constructorId", "date"]).issubset(df.columns):
+            return pd.DataFrame(columns=["driverId", "driver_name", "n_changes"])
+
+        # Sort by driver and date
+        df = df.sort_values(["driverId", "date", "raceId"]) if "raceId" in df.columns else df.sort_values(["driverId", "date"])
+
+        # Compute changes per driver as number of transitions where constructorId changes between consecutive races
+        def count_transitions(sub):
+            # keep only constructorId sequence
+            seq = sub["constructorId"].astype(str).tolist()
+            if not seq:
+                return 0
+            transitions = sum(1 for a, b in zip(seq, seq[1:]) if a != b)
+            return transitions
+
+        grouped = df.groupby("driverId").apply(count_transitions).reset_index(name="n_changes")
+
+        # Attach driver names if available in drivers.csv (datasets)
+        drivers_path = path.parent / "drivers.csv"
+        if drivers_path.exists():
+            ddf = pd.read_csv(drivers_path, usecols=["driverId", "forename", "surname"], dtype={"driverId": object})
+            ddf["driver_name"] = ddf["forename"].fillna("") + " " + ddf["surname"].fillna("")
+            grouped = grouped.merge(ddf[["driverId", "driver_name"]], on="driverId", how="left")
+        else:
+            grouped["driver_name"] = grouped["driverId"].astype(str)
+
+        grouped = grouped.sort_values(["n_changes", "driverId"]).head(10)
+        return grouped[["driverId", "driver_name", "n_changes"]]
+
+    def try_clickhouse_snapshot_top10():
+        # Try to query ClickHouse snapshot table created by dbt snapshot.
+        # env vars follow scripts/.env usage: CH_HOST, CH_PORT, CH_USER, CH_PASS, CH_DB_ANALYTICS
+        if get_client is None:
+            return None
+
+        ch_host = os.getenv("CH_HOST", "localhost")
+        ch_port = int(os.getenv("CH_PORT", 8123))
+        ch_user = os.getenv("CH_USER", "default")
+        ch_pass = os.getenv("CH_PASS", "") or None
+        db = os.getenv("CH_DB_ANALYTICS", "analytics")
+
+        try:
+            client = get_client(host=ch_host, port=ch_port, username=ch_user, password=ch_pass)
+        except Exception:
+            return None
+
+        # Common dbt snapshot relation name: analytics.driver_constructors_snapshot
+        snapshot_table = f"{db}.driver_constructors_snapshot"
+
+        # Build SQL to compute number of distinct constructors or transitions per driver in last 5 years.
+        # We'll count distinct constructor periods in the snapshot rows within the timeframe.
+        sql = f"""
+        SELECT
+            driverId,
+            countDistinct(constructorId) AS n_teams
+        FROM {snapshot_table}
+        WHERE dbt_valid_from >= subtractYears(today(), 5)
+        GROUP BY driverId
+        ORDER BY n_teams ASC
+        LIMIT 10
+        """
+        try:
+            res = client.query(sql)
+            # clickhouse-connect returns .result_rows or .dictresult depending on API
+            rows = []
+            try:
+                rows = res.result_rows
+            except Exception:
+                try:
+                    rows = res.result_set
+                except Exception:
+                    rows = list(res)
+
+            # Normalize to DataFrame
+            df = pd.DataFrame(rows, columns=[c[0] for c in res.columns]) if hasattr(res, "columns") else pd.DataFrame(rows)
+            # Try to attach names if `analytics.drivers` exists
+            try:
+                drv = client.query(f"SELECT driverId, forename, surname FROM {db}.drivers")
+                drv_rows = drv.result_rows if hasattr(drv, 'result_rows') else list(drv)
+                drv_df = pd.DataFrame(drv_rows, columns=[c[0] for c in drv.columns])
+                drv_df["driver_name"] = drv_df["forename"].fillna("") + " " + drv_df["surname"].fillna("")
+                df = df.merge(drv_df[["driverId", "driver_name"]], on="driverId", how="left")
+            except Exception:
+                df["driver_name"] = df["driverId"].astype(str)
+
+            # Ensure columns
+            if "n_teams" in df.columns:
+                df = df.rename(columns={"n_teams": "n_changes"})
+            df = df[["driverId", "driver_name", "n_changes"]]
+            return df
+        except Exception:
+            return None
+
+    def try_clickhouse_results_top10():
+        """Query ClickHouse `fact_race_results` joined with `stg_races` to compute
+        distinct constructors per active driver in the last 5 years.
+        """
+        if get_client is None:
+            return None
+
+        ch_host = os.getenv("CH_HOST", "localhost")
+        ch_port = int(os.getenv("CH_PORT", 8123))
+        ch_user = os.getenv("CH_USER", "default")
+        ch_pass = os.getenv("CH_PASS", "") or None
+        db = os.getenv("CH_DB_ANALYTICS", "analytics")
+
+        try:
+            client = get_client(host=ch_host, port=ch_port, username=ch_user, password=ch_pass)
+        except Exception:
+            return None
+
+        sql = f'''
+        SELECT r.driverId, countDistinct(r.constructorId) AS n_teams
+        FROM {db}.fact_race_results AS r
+        JOIN {db}.stg_races AS ra USING (raceId)
+        WHERE ra.fecha >= subtractYears(today(), 5)
+        GROUP BY r.driverId
+        ORDER BY n_teams ASC, r.driverId ASC
+        LIMIT 10
+        '''
+        try:
+            res = client.query(sql)
+            rows = []
+            try:
+                rows = res.result_rows
+            except Exception:
+                try:
+                    rows = res.result_set
+                except Exception:
+                    rows = list(res)
+
+            # Normalize to DataFrame
+            df = pd.DataFrame(rows, columns=[c[0] for c in res.columns]) if hasattr(res, 'columns') else pd.DataFrame(rows)
+
+            # Map driver names: try analytics.drivers table first
+            try:
+                drv = client.query(f"SELECT driverId, forename, surname FROM {db}.drivers")
+                drv_rows = drv.result_rows if hasattr(drv, 'result_rows') else list(drv)
+                drv_df = pd.DataFrame(drv_rows, columns=[c[0] for c in drv.columns])
+                drv_df['driver_name'] = drv_df['forename'].fillna('') + ' ' + drv_df['surname'].fillna('')
+                df = df.merge(drv_df[['driverId', 'driver_name']], on='driverId', how='left')
+            except Exception:
+                # Fallback to local CSV in repo
+                try:
+                    drv_csv = ROOT / 'datasets' / 'drivers.csv'
+                    if drv_csv.exists():
+                        ddf = pd.read_csv(drv_csv, usecols=['driverId', 'forename', 'surname'])
+                        ddf['driverId'] = ddf['driverId'].astype(str)
+                        ddf['driver_name'] = ddf['forename'].fillna('') + ' ' + ddf['surname'].fillna('')
+                        df['driverId'] = df['driverId'].astype(str)
+                        df = df.merge(ddf[['driverId', 'driver_name']], on='driverId', how='left')
+                    else:
+                        df['driver_name'] = df['driverId'].astype(str)
+                except Exception:
+                    df['driver_name'] = df['driverId'].astype(str)
+
+            # Normalize column names
+            if 'n_teams' in df.columns:
+                df = df.rename(columns={'n_teams': 'n_changes'})
+
+            df = df[['driverId', 'driver_name', 'n_changes']]
+            return df
+        except Exception:
+            return None
+
+    def try_docker_results_top10():
+        """Run `docker exec clickhouse clickhouse-client` to get the same results.
+        This avoids ClickHouse client library auth/port issues by executing the
+        query inside the container where it runs as the server user.
+        """
+        import subprocess
+        sql = (
+            "SELECT r.driverId, countDistinct(r.constructorId) AS n_teams "
+            "FROM analytics.fact_race_results AS r "
+            "JOIN analytics.stg_races AS ra USING (raceId) "
+            "WHERE ra.fecha >= subtractYears(today(), 5) "
+            "GROUP BY r.driverId "
+            "ORDER BY n_teams ASC, r.driverId ASC "
+            "LIMIT 10"
+        )
+        cmd = [
+            "docker",
+            "exec",
+            "-i",
+            "clickhouse",
+            "clickhouse-client",
+            "--format",
+            "CSVWithNames",
+            "--query",
+            sql,
+        ]
+        try:
+            print('DEBUG: running docker exec for ClickHouse query', cmd)
+            out = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+            print('DEBUG: docker exec completed, bytes=', len(out))
+            s = out.decode("utf-8")
+            # Use pandas to parse CSV output
+            from io import StringIO
+
+            df = pd.read_csv(StringIO(s))
+            print('DEBUG: Parsed dataframe shape:', df.shape)
+            print('DEBUG: Dataframe columns:', df.columns.tolist())
+            print('DEBUG: First few rows:\n', df.head())
+            
+            # ensure columns driverId and n_teams present
+            if "driverId" in df.columns and "n_teams" in df.columns:
+                # Map driver names from local CSV
+                drv_csv = ROOT / "datasets" / "drivers.csv"
+                if drv_csv.exists():
+                    print(f'DEBUG: Loading driver names from {drv_csv}')
+                    ddf = pd.read_csv(drv_csv, usecols=["driverId", "forename", "surname"]) 
+                    ddf['driverId'] = ddf['driverId'].astype(str)
+                    ddf['driver_name'] = ddf['forename'].fillna('').astype(str).str.strip() + ' ' + ddf['surname'].fillna('').astype(str).str.strip()
+                    ddf['driver_name'] = ddf['driver_name'].str.strip()
+                    
+                    # Convert driverId to string for merging
+                    df['driverId'] = df['driverId'].astype(str)
+                    df = df.merge(ddf[['driverId', 'driver_name']], on='driverId', how='left')
+                    print('DEBUG: After merge, dataframe shape:', df.shape)
+                    print('DEBUG: After merge, first few rows:\n', df.head())
+                else:
+                    print(f'DEBUG: Driver CSV not found at {drv_csv}, using IDs as names')
+                    df['driver_name'] = df['driverId'].astype(str)
+                
+                df['driverId'] = df['driverId'].astype(int)
+                df = df.rename(columns={'n_teams': 'n_changes'})
+                result = df[['driverId', 'driver_name', 'n_changes']]
+                print('DEBUG: Final result:\n', result)
+                return result
+            print('DEBUG: Missing required columns driverId or n_teams')
+            return None
+        except Exception as e:
+            print(f'DEBUG: Error in try_docker_results_top10: {e}')
+            import traceback
+            traceback.print_exc()
+            return None
+            return None
+        except Exception as e:
+            print(f'DEBUG: Error in try_docker_results_top10: {e}')
+            return None
+
+    # Try ClickHouse first
+    ch_df = try_clickhouse_snapshot_top10()
+    if ch_df is not None and not ch_df.empty:
+        st.write("Data source: ClickHouse dbt snapshot `driver_constructors_snapshot` (last 5 years)")
+        ch_df_display = ch_df.copy()
+        ch_df_display.columns = ['Driver ID', 'Driver Name', 'Constructor Changes']
+        st.dataframe(ch_df_display, use_container_width=True)
+        csv_download_button(ch_df, "top10_least_changes_clickhouse.csv", "Download CSV")
+    else:
+        # If snapshot is not available, try computing from ClickHouse results (active drivers)
+        ch_results_df = try_clickhouse_results_top10()
+        if ch_results_df is not None and not ch_results_df.empty:
+            st.write("Data source: ClickHouse `fact_race_results` joined with `stg_races` (active drivers, last 5 years)")
+            ch_results_display = ch_results_df.copy()
+            ch_results_display.columns = ['Driver ID', 'Driver Name', 'Constructor Changes']
+            st.dataframe(ch_results_display, use_container_width=True)
+            csv_download_button(ch_results_df, "top10_least_changes_clickhouse_results.csv", "Download CSV")
+        else:
+            # If ClickHouse Python client failed, try running `docker exec` in the
+            # host to query the ClickHouse server from inside the container.
+            ch_docker_df = try_docker_results_top10()
+            if ch_docker_df is not None and not ch_docker_df.empty:
+                st.write("Data source: ClickHouse (via docker exec clickhouse-client)")
+                
+                # Create a nice display with custom formatting
+                ch_docker_display = ch_docker_df.copy()
+                ch_docker_display.columns = ['Driver ID', 'Driver Name', 'Constructor Changes']
+                
+                # Display as a nice table
+                st.dataframe(ch_docker_display, use_container_width=True)
+                
+                # Add a bar chart for visual comparison
+                fig = px.bar(
+                    ch_docker_df,
+                    x='driver_name',
+                    y='n_changes',
+                    title='Drivers with Fewest Constructor Changes (Last 5 Years)',
+                    labels={'driver_name': 'Driver', 'n_changes': 'Number of Constructor Changes'},
+                    color='n_changes',
+                    color_continuous_scale='RdYlGn_r'
+                )
+                fig.update_layout(
+                    xaxis_tickangle=-45,
+                    height=400,
+                    showlegend=False
+                )
+                st.plotly_chart(fig, use_container_width=True)
+                
+                csv_download_button(ch_docker_df, "top10_least_changes_clickhouse_docker.csv", "Download CSV")
+            else:
+                # Fallback to datasets/results.csv
+                results_path = (ROOT / ".." / "datasets" / "results.csv").resolve()
+                if results_path.exists():
+                    df_top10 = compute_top10_least_changes_from_csv(results_path)
+                    st.write("Data source: fallback from local `datasets/results.csv` (last 5 years)")
+                    if df_top10.empty:
+                        st.info("Not enough data in results.csv to compute driver changes.")
+                    else:
+                        df_display = df_top10.copy()
+                        df_display.columns = ['Driver ID', 'Driver Name', 'Constructor Changes']
+                        st.dataframe(df_display, use_container_width=True)
+                        csv_download_button(df_top10, "top10_least_changes_fallback.csv", "Download CSV")
+                else:
+                    st.warning("No ClickHouse snapshot found and `datasets/results.csv` is missing. Cannot compute top-10 drivers with fewest constructor changes.")
+        
 
 
 if __name__ == "__main__":
