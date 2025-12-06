@@ -136,5 +136,3 @@ Notas importantes observadas en el código (explicadas):
 - Implementación concreta del loader: `scripts/load_csvs_to_clickhouse.py` muestra una implementación en Python que utiliza `clickhouse-connect` para conectarse a ClickHouse, crear tablas `raw.raw_<name>` cuando es necesario y bulk-insertar filas. El script incluye manejo básico de valores especiales (p. ej. reemplazo de `\\N`) y particionado por archivos para facilitar reintentos.
 
 - Uso de `dbt` dentro de contenedores: el `dbt-runner` definido en `docker-compose.yml` se usa en este repositorio para ejecutar tareas de transformación y pruebas (`dbt run`, `dbt test`) en un entorno controlado. Esto permite que las transformaciones sean reproducibles y que las pruebas de contratos (tests de dbt) se ejecuten de forma consistente en CI/local.
-
-Si quieres que haga cambios adicionales a otras páginas del sitio con el mismo estilo (menos texto generado por IA y explicaciones más técnicas), dime y prosigo con los archivos restantes.
